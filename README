@@ -1,0 +1,51 @@
+his
+===
+
+Human Intelligence System - HTTP API for Automation
+version 2014-07-16 Alpha
+
+
+What is HIS:
+
+	A Web Interface
+		An easy place to copy/paste/upload your source code and
+		binaries, into a simple interface. This allows you to
+		easily construct "HIS Functions", small atomic pieces
+		of automation logic, using the programming language of
+		your choice.
+
+	Job Servers
+		A fancy "for" loop that executes your source HIS Functions'
+		codes and binaries as "jobs".  Special, plain HTTP requests
+		to the Web Interface (see above) is how jobs are launched/
+		created.
+
+	
+
+How to install - 3 easy steps:
+
+	DOWNLOAD
+	1. Download or Clone his.git or his.zip
+	
+		If you're reading this, you might have already downloaded
+			these files to your computer already. If so,
+			skip this step.
+	
+			If git clone:
+			   git clone https://github.com/hisapi/his.git
+				 
+			If downloading:
+			   Visit https://humanintelligencesystem.com/
+				to download your his.zip or his.tar file.
+
+	EXTRACT
+	2. Do a basic extract of his.zip or his.tar to your www/ folder,
+		resulting in the creation of the new folder www/his/
+
+	VISIT
+	3. Visit your new folder http://.../his/ in web browser
+		to begin installation.
+
+
+
+For questions or support visit https://humanintelligencesystem.com/

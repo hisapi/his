@@ -1,0 +1,680 @@
+<services>
+    <service type="database" name="mysql">
+        <settingsfile>
+    <mysql>
+        <server value="{{DBHOST|||Database Host|||You should be able to get this info from your web host, if localhost does not work.|||localhost|||||||||true}}"/>
+        <user value="{{DBUSER|||User Name|||Your database username|||username|||||||||true}}"/>
+            <pass value="{{DBPASS|||Password|||...and your database password.|||password|||||||||true}}"/>
+            <database value="{{DBNAME|||Database Name|||The name of the database you want to run HIS in. Database needs to exist already.|||hisdb|||||||||true}}"/>
+            <table-prefix value="{{DBTABLEPREFIX|||Table Prefix|||If you want to run multiple HIS installations in a single database, change this.|||his_|||||||||false}}"/>
+    </mysql>
+        </settingsfile>
+        <dependencies>
+            <dependency>
+                <php-constant-defined>
+                    <name value="MYSQL_ASSOC"/>
+                </php-constant-defined>
+                <error-message value="PHP extension php_mysql/php_mysqli must be enabled."/>
+            </dependency>
+        </dependencies>
+        <icon value="images/mysql.png"/>
+        <home value="http://php.net/manual/en/book.mysql.php"/>
+    </service>
+    <service type="database" name="mssql">
+        <settingsfile>
+            <mssql>
+                <server value="{{DBHOST|||Database Host|||You should be able to get this info from your web host, if localhost does not work.|||localhost|||||||||true}}"/>
+                <user value="{{DBUSER|||User Name|||Your database username|||username|||||||||true}}"/>
+                <pass value="{{DBPASS|||Password|||...and your database password.|||password|||||||||true}}"/>
+                <database value="{{DBNAME|||Database Name|||The name of the database you want to run HIS in. Database needs to exist already.|||hisdb|||||||||true}}"/>
+                <table-prefix value="{{DBTABLEPREFIX|||Table Prefix|||If you want to run multiple HIS installations in a single database, change this.|||his_|||||||||false}}"/>
+            </mssql>
+        </settingsfile>
+        <dependencies>
+            <dependency>
+                <php-constant-defined>
+                    <name value="MSSQL_ASSOC"/>
+                </php-constant-defined>
+                <error-message value="PHP extension php_mssql must be enabled."/>
+            </dependency>
+        </dependencies>
+        <icon value="images/mssql.png"/>
+        <home value="http://php.net/manual/en/book.mssql.php"/>
+    </service>
+    <service type="database" name="oracle">
+        <settingsfile>
+            <oracle>
+                <server value="{{DBHOST|||Database Host|||You should be able to get this info from your web host, if localhost does not work.|||localhost|||||||||true}}"/>
+                <user value="{{DBUSER|||User Name|||Your database username|||username|||||||||true}}"/>
+                <pass value="{{DBPASS|||Password|||...and your database password.|||password|||||||||true}}"/>
+                <database value="{{DBNAME|||Service Name|||The name of the service/database you want to run HIS in. Database needs to exist already.|||hisdb|||||||||true}}"/>
+                <table-prefix value="{{DBTABLEPREFIX|||Table Prefix|||If you want to run multiple HIS installations in a single database, change this.|||his_|||||||||false}}"/>
+            </oracle>
+        </settingsfile>
+        <dependencies>
+            <dependency>
+                <php-constant-defined>
+                    <name value="OCI_ASSOC"/>
+                </php-constant-defined>
+                <error-message value="PHP extension php_oci8/php_oci8_11g must be enabled.  Oracle Instant Client must also be enabled."/>
+            </dependency>
+        </dependencies>
+        <icon value="images/oracle.png"/>
+        <home value="http://php.net/manual/en/book.oci8.php"/>
+    </service>
+    <service type="database" name="postgres">
+        <settingsfile>
+            <postgres>
+                <server value="{{DBHOST|||Database Host|||You should be able to get this info from your web host, if localhost does not work.|||localhost|||||||||true}}"/>
+                <user value="{{DBUSER|||User Name|||Your database username|||username|||||||||true}}"/>
+                <pass value="{{DBPASS|||Password|||...and your database password.|||password|||||||||true}}"/>
+                <database value="{{DBNAME|||Service Name|||The name of the database you want to run HIS in. Database needs to exist already.|||hisdb|||||||||true}}"/>
+                <table-prefix value="{{DBTABLEPREFIX|||Table Prefix|||If you want to run multiple HIS installations in a single database, change this.|||his_|||||||||false}}"/>
+            </postgres>
+        </settingsfile>
+        <dependencies>
+            <dependency>
+                <php-constant-defined>
+                    <name value="PGSQL_ASSOC"/>
+                </php-constant-defined>
+                <error-message value="PHP extension php_pgsql must be enabled."/>
+            </dependency>
+        </dependencies>
+        <icon value="images/postgres.png"/>
+        <home value="http://php.net/manual/en/book.pgsql.php"/>
+    </service>
+    <service type="database" name="sqlite">
+        <dependencies>
+            <dependency>
+                <php-constant-defined>
+                    <name value="SQLITE3_ASSOC"/>
+                </php-constant-defined>
+                <error-message value="PHP extension php_sqlite must be enabled."/>
+            </dependency>
+        </dependencies>
+        <icon value="images/sqlite.png"/>
+        <home value="http://php.net/manual/en/book.sqlite.php"/>
+    </service>
+    <service type="database" name="dynamodb">
+        <settingsfile>
+        <dynamodb>
+            <access-key value="{{DYNAMO-ACCESS-KEY|||AWS Access Key|||Your AWS Access Key. Never share with anyone.|||5F5fDKSLT44G4VM344TG|||||||||true}}"/>
+            <secret-key value="{{DYNAMO-SECRET-KEY|||AWS Secret Key|||Your AWS Secret Key.  Never share with anyone.|||Cr4jZFSDKkea5d8JVSlsaPQf34wa5sdef89wsa4|||images/aws-keys.png||||||true}}"/>
+            <region value="{{DYNAMO-REGION-NAME|||Region|||Choices are REGION_US_E1, REGION_US_W1, REGION_US_W2, REGION_EU_W1, REGION_APAC_SE1, REGION_APAC_SE2, REGION_APAC_NE1, REGION_SA_E1, REGION_US_GOV1|||REGION_US_E1|||||||||true}}"/>
+            <table-prefix value="{{DBTABLEPREFIX|||Table Prefix|||If you want to run multiple HIS installations in a single database, change this.|||his_|||||||||false}}"/>
+        </dynamodb>
+        </settingsfile>
+        <home value='http://aws.amazon.com/dynamodb/'/>
+        <dependencies>
+            <dependency>
+                <php-function-exists>
+                    <name value="simplexml_load_file"/>
+                </php-function-exists>
+                <error-message value="PHP 5.2+ and SimpleXML are required."/>
+            </dependency>
+            <dependency>
+                <php-constant-defined>
+                    <name value="JSON_ERROR_UTF8"/>
+                </php-constant-defined>
+                <error-message value="PHP 5.2+ and JSON are required."/>
+            </dependency>
+            <dependency>
+                <php-constant-defined>
+                    <name value="PREG_SET_ORDER"/>
+                </php-constant-defined>
+                <error-message value="PHP 5.2+ and PCRE are required."/>
+            </dependency>
+            <dependency>
+                <php-function-exists>
+                    <name value="spl_classes"/>
+                </php-function-exists>
+                <error-message value="PHP 5.2+ and SPL are required."/>
+            </dependency>
+            <dependency>
+                <php-constant-defined>
+                    <name value="CURLOPT_AUTOREFERER"/>
+                </php-constant-defined>
+                <error-message value="PHP 5.2+ and cURL (w/HTTPS support) are required."/>
+            </dependency>
+        </dependencies>
+        <icon value="images/aws.png"/>
+        <home value="http://aws.amazon.com/dynamodb/"/>
+    </service>  
+    <service type="database" name="cassandra">
+        <icon value="images/cassandra.png"/>
+                <dependencies>
+                        <dependency>
+                                <php-function-exists>
+                                        <name value="CassandraClient"/>
+                                </php-function-exists>
+                                <error-message value="Thrift and Cassandra are required."/>
+                        </dependency>
+                </dependencies>
+        <home value="http://support.qualityunit.com/942764-Example-of-PHP-application-readingwriting-to-Cassandra"/>
+    </service>
+    <service type="database" name="mongodb">
+    <settingsfile>
+    <mongodb>
+        <server value="{{DBHOST|||Database Host|||You should be able to get this info from your web host, if localhost does not work.|||localhost|||||||||true}}"/>
+        <user value="{{DBUSER|||User Name|||Your database username|||username|||||||||true}}"/>
+        <pass value="{{DBPASS|||Password|||...and your database password.|||password|||||||||true}}"/>
+        <database value="{{DBNAME|||Database Name|||The name of the database you want to run HIS in. Database needs to exist already.|||hisdb|||||||||true}}"/>
+        <table-prefix value="{{DBTABLEPREFIX|||Table Prefix|||If you want to run multiple HIS installations in a single database, change this.|||his_|||||||||false}}"/>
+    </mongodb>
+    </settingsfile>
+        <dependencies>
+            <dependency>
+                <php-constant-defined>
+                    <name value="MongoLog::ALL"/>
+                </php-constant-defined>
+                <error-message value="Mongo native libraries are required."/>
+            </dependency>
+        </dependencies>
+        <icon value="images/mongodb.png"/>
+        <home value="http://php.net/manual/en/book.mongo.php"/>
+    </service>  
+    <service type="database" name="interbase">
+        <dependencies>
+            <dependency>
+                <php-constant-defined>
+                    <name value="IBASE_DEFAULT"/>
+                </php-constant-defined>
+                <error-message value="PHP extension php_interbase must be enabled."/>
+            </dependency>
+        </dependencies>
+        <icon value="images/interbase.png"/>
+        <home value="http://php.net/manual/en/book.ibase.php"/>
+    </service>  
+    <service type="database" name="hbase">
+        <icon value="images/hbase.png"/>
+        <home value="http://hbase.apache.org/"/>
+    </service>
+    <service type="database" name="hypertable">
+        <icon value="images/hypertable.png"/>
+                <dependencies>
+                        <dependency>
+                                <php-function-exists>
+                                        <name value="Hypertable_ThriftGen_Key"/>
+                                </php-function-exists>
+                                <error-message value="PHP Hypertable Library + Thrift Library is required."/>
+                        </dependency>
+                </dependencies>
+        <home value="http://hypertable.com/documentation/code_examples/php/"/>
+    </service>
+   <service type="database" name="simpledb">
+        <dependencies>
+            <dependency>
+                <php-function-exists>
+                    <name value="simplexml_load_file"/>
+                </php-function-exists>
+                <error-message value="PHP 5.2+ and SimpleXML are required."/>
+            </dependency>
+            <dependency>
+                <php-constant-defined>
+                    <name value="JSON_ERROR_UTF8"/>
+                </php-constant-defined>
+                <error-message value="PHP 5.2+ and JSON are required."/>
+            </dependency>
+            <dependency>
+                <php-constant-defined>
+                    <name value="PREG_SET_ORDER"/>
+                </php-constant-defined>
+                <error-message value="PHP 5.2+ and PCRE are required."/>
+            </dependency>
+            <dependency>
+                <php-function-exists>
+                    <name value="spl_classes"/>
+                </php-function-exists>
+                <error-message value="PHP 5.2+ and SPL are required."/>
+            </dependency>
+            <dependency>
+                <php-constant-defined>
+                    <name value="CURLOPT_AUTOREFERER"/>
+                </php-constant-defined>
+                <error-message value="PHP 5.2+ and cURL (w/HTTPS support) are required."/>
+            </dependency>
+        </dependencies>
+        <icon value="images/aws.png"/>
+        <home value="http://aws.amazon.com/simpledb/"/>
+    </service>  
+    <service type="database" name="filemaker">
+        <icon value="images/filemaker.png"/>
+        <home value=""/>
+    </service>
+    <service type="database" name="googlecloudsql">
+        <icon value="images/googlecloudstorage.png"/>
+        <home value="https://developers.google.com/cloud-sql/"/>
+    </service>
+    <service type="database" name="azure">
+        <icon value="images/azure.png"/>
+                <dependencies>
+                        <dependency>
+                                <php-function-exists>
+                                        <name value="CloudSubscription"/>
+                                </php-function-exists>
+                                <error-message value="azure-sdk-for-php is required."/>
+                        </dependency>
+        </dependencies>
+        <home value="https://github.com/WindowsAzure/azure-sdk-for-php"/>
+    </service>
+   
+    <service type="file-storage" name="s3">
+        <settingsfile>
+    <s3>
+        <access-key value="{{S3-ACCESS-KEY|||AWS Access Key|||Your AWS Access Key. Never share with anyone.|||5F5fDKSLT44G4VM344TG|||||||||true}}"/>
+        <secret-key value="{{S3-SECRET-KEY|||AWS Secret Key|||Your AWS Secret Key.  Never share with anyone.|||Cr4jZFSDKkea5d8JVSlsaPQf34wa5sdef89wsa4|||images/aws-keys.png||||||true}}"/>
+        <region value="{{S3-REGION-NAME|||Region|||Choices are REGION_US_STANDARD, REGION_US_E1, REGION_US_W1, REGION_US_W2, REGION_VIRGINIA, REGION_US_GOV1, REGION_US_GOV1_FIPS, REGION_APAC_NE1, REGION_APAC_SE1, REGION_APAC_SE2, REGION_EU_W1, REGION_SA_E1, REGION_SINGAPORE, REGION_SYDNEY, REGION_TOKYO, REGION_CALIFORNIA, REGION_IRELAND, REGION_OREGON, REGION_SAO_PAULO |||REGION_US_STANDARD|||||||||true}}"/>
+        <file-expiration value="2029-01-01T00:00:00Z"/>
+        <redirect value="{uri}?q={qid}"/>
+        <bucket value="{{S3-BUCKET-NAME|||S3 Bucket Name|||S3 Bucket Name to store files in. Needs to exist already.|||hisbucket00|||||||||true}}"/>
+        <upload>
+            <default-acl value="public-read"/>
+            <filename value="dynamic"/>
+        </upload>
+        <paths>
+            <job-input value="{{S3-PATH-UPLOADS-JOBS-INPUTS|||S3 Input Path|||This does not have to be changed|||uploads/jobs/inputs|||||||||falsee}}"/>
+            <job-output value="{{S3-PATH-UPLOADS-JOBS-OUTPUTS|||S3 Output Path|||This does not have to be changed|||uploads/jobs/outputs|||||||||false}}"/>
+            <saved-outputs value="{{S3-PATH-SAVED-OUTPUTS|||S3 Saved Outputs Path|||This does not have to be changed|||uploads/saved-outputs|||||||||false}}"/>
+            <strings value="{{S3-PATH-SAVED-STRINGS|||S3 Saved Strings Path|||This does not have to be changed|||uploads/strings|||||||||false}}"/>
+        </paths>
+    </s3>
+        </settingsfile>
+        <dependencies>
+            <dependency>
+                <php-function-exists>
+                    <name value="simplexml_load_file"/>
+                </php-function-exists>
+                <error-message value="PHP 5.2+ and SimpleXML are required."/>
+            </dependency>
+            <dependency>
+                <php-constant-defined>
+                    <name value="JSON_ERROR_UTF8"/>
+                </php-constant-defined>
+                <error-message value="PHP 5.2+ and JSON are required."/>
+            </dependency>
+            <dependency>
+                <php-constant-defined>
+                    <name value="PREG_SET_ORDER"/>
+                </php-constant-defined>
+                <error-message value="PHP 5.2+ and PCRE are required."/>
+            </dependency>
+            <dependency>
+                <php-function-exists>
+                    <name value="spl_classes"/>
+                </php-function-exists>
+                <error-message value="PHP 5.2+ and SPL are required."/>
+            </dependency>
+            <dependency>
+                <php-constant-defined>
+                    <name value="CURLOPT_AUTOREFERER"/>
+                </php-constant-defined>
+                <error-message value="PHP 5.2+ and cURL (w/HTTPS support) are required."/>
+            </dependency>
+        </dependencies>
+        <home value='http://aws.amazon.com/s3/'/>
+        <icon value="images/aws.png"/>
+    </service>  
+    <service type="file-storage" name="rackspacecloudfiles">
+        <icon value="images/rackspace.png"/>
+    <settingsfile>
+    <rackspacecloudfiles>
+        <user-name value="{{RS-USER-NAME|||Rackspace User Name|||Your Rackspace user name.|||my_username|||||||||true}}"/>
+        <api-key value="{{RS-API-KEY|||Rackspace API Key|||Your API Key.  Never share with anyone.|||56rafejk34rr33rzas45345zmzcvZq34|||images/rackspace-api.png||||||true}}"/>
+        <file-expiration value="2029-01-01T00:00:00Z"/>
+        <redirect value="{uri}?q={qid}"/>
+        <container value="{{RS-CONTAINER-NAME|||Cloud Files Container Name|||Container Name to store files in. Needs to exist already.|||hisbucket00|||images/rackspace-cdn.png||||||true}}"/>
+        <upload>
+            <default-acl value="public-read"/>
+            <filename value="dynamic"/>
+        </upload>
+        <paths>
+            <job-input value="{{RS-PATH-UPLOADS-JOBS-INPUTS|||Cloud Files Input Path|||This does not have to be changed|||uploads/jobs/inputs|||||||||false}}"/>
+            <job-output value="{{RS-PATH-UPLOADS-JOBS-OUTPUTS|||Cloud Files Output Path|||This does not have to be changed|||uploads/jobs/outputs|||||||||false}}"/>
+            <saved-outputs value="{{RS-PATH-SAVED-OUTPUTS|||Cloud Files Saved Outputs Path|||This does not have to be changed|||uploads/saved-outputs|||images/rackspace-account.png||||||false}}"/>
+            <strings value="{{RS-PATH-SAVED-STRINGS|||Cloud Files Saved Strings Path|||This does not have to be changed|||uploads/strings|||||||||false}}"/>
+        </paths>
+    </rackspacecloudfiles>
+    </settingsfile>
+        <dependencies>
+                <dependency>
+                        <php-function-exists>
+                                <name value="curl_exec"/>
+                        </php-function-exists>
+                        <error-message value="php5-curl is required."/>
+                </dependency>
+                <dependency>
+                        <php-function-exists>
+                                <name value="mb_check_encoding"/>
+                        </php-function-exists>
+                        <error-message value="php5-mbstring is required."/>
+                </dependency>
+        </dependencies>
+    <home value="http://www.rackspace.com/cloud/public/files/"/>
+    </service>
+    <service type="file-storage" name="localdisk">
+        <settingsfile>
+        <localdisk>
+            <folder value="{{LOCALDISK-FOLDER-NAME|||Base Folder Path|||FULL PATH to folder on local hard drive. Needs to exist already.|||/var/www/html/his/hisbucket00|||||||||true}}"/>
+            <webfolder value="{{LOCALDISK-WEBFOLDER-NAME|||Base Web Folder Path|||FULL PATH to folder above as HTTP path. Needs to exist already.|||{uri}|||||||||true}}"/>
+            <redirect value="{uri}/?q={qid}"/>
+            <paths>
+                <job-input value="{{FOLDER-PATH-UPLOADS-JOBS-INPUTS|||Input Path|||This does not have to be changed|||uploads/jobs/inputs|||||||||false}}"/>
+                <job-output value="{{FOLDER-PATH-UPLOADS-JOBS-OUTPUTS|||Output Path|||This does not have to be changed|||uploads/jobs/outputs|||||||||false}}"/>
+                <saved-outputs value="{{FOLDER-PATH-SAVED-OUTPUTS|||Saved Outputs Path|||This does not have to be changed|||uploads/saved-outputs|||||||||false}}"/>
+                <strings value="{{FOLDER-PATH-SAVED-STRINGS|||Saved Strings Path|||This does not have to be changed|||uploads/strings|||images/localdisk-permissions.png|||&lt;script&gt;
+var wf=document.getElementById(&quot;LOCALDISK-WEBFOLDER-NAME&quot;);
+var wl=window.location+&quot;&quot;;
+var ls=wl.lastIndexOf(&quot;/&quot;);
+wl = wl.substring(0,ls);
+wl = wl + &quot;/hisbucket00&quot;;
+wf.value=wl;
+
+function update()
+{
+    if (navigator.appVersion.indexOf(&quot;Win&quot;)!=-1){
+        var wp=document.getElementById(&quot;LOCALDISK-FOLDER-NAME&quot;);
+        if (wp.value==&quot;/var/www/html/his/hisbucket00&quot;)
+        {
+            wp.value=&quot;C:\\wamp\\www\\his\\hisbucket00&quot;;
+        }
+    }
+    var uf=document.getElementById(&quot;LOCALDISK-FOLDER-NAME&quot;);
+    var bd=uf.value+&quot;&quot;;
+    var uf = document.getElementById(&quot;mkdir_linux&quot;);
+    var bdl=bd.replace(/\\/g,&quot;/&quot;);
+    uf.value=&quot;cd &quot;+bdl+&quot;\n&quot;;
+    
+    var uf = document.getElementById(&quot;mkdir_win&quot;);
+    var bdw=bd.replace(/\//g,&quot;\\&quot;);
+    uf.value=&quot;mkdir &quot;+bdw+&quot;\n&quot;;
+    uf.value=uf.value+&quot;cd /d &quot;+bdw+&quot;\n&quot;;
+    
+    var fps=new Array(&quot;FOLDER-PATH-UPLOADS-JOBS-INPUTS&quot;,&quot;FOLDER-PATH-UPLOADS-JOBS-OUTPUTS&quot;,&quot;FOLDER-PATH-SAVED-OUTPUTS&quot;,&quot;FOLDER-PATH-SAVED-STRINGS&quot;);
+    for (var i=0;i&lt;fps.length;i++)
+    {
+        var fe=document.getElementById(fps[i]);
+        var fev=fe.value+&quot;&quot;;
+
+        var fevl=fev.replace(/\\/g,&quot;/&quot;);
+        var lm = document.getElementById(&quot;mkdir_linux&quot;);
+        
+        lm.value = lm.value + &quot;mkdir -p &quot; +fevl+&quot;\n&quot;;
+        lm.value = lm.value + &quot;chown www-data &quot; +fevl+&quot;\n&quot;;
+        lm.value = lm.value + &quot;chmod 774 &quot; +fevl+&quot; -R\n&quot;;
+
+        var fevw=fev.replace(/\//g,&quot;\\&quot;);
+        var lm = document.getElementById(&quot;mkdir_win&quot;);
+        
+        lm.value = lm.value + &quot;mkdir &quot; +fevw+&quot;\n&quot;;
+        
+    }
+}
+&lt;/script&gt;
+&lt;div style=&quot;text-align:left;&quot;&gt;
+&lt;input style=&quot;float:right;&quot; type=&quot;button&quot; onClick=&quot;update();&quot; value=&quot;Update Mkdir Scripts&quot;/&gt;&lt;br/&gt;
+Linux Mkdir commands:&lt;br/&gt;
+&lt;textarea id=&quot;mkdir_linux&quot; style=&quot;width:100%;background-color:#eee;font-family:Courier New;&quot; rows=&quot;16&quot;&gt;&lt;/textarea&gt;&lt;br/&gt;
+Windows Mkdir commands:&lt;br/&gt;
+&lt;textarea id=&quot;mkdir_win&quot; style=&quot;width:100%;background-color:#eee;font-family:Courier New;&quot; rows=&quot;8&quot;&gt;&lt;/textarea&gt;
+&lt;/div&gt;
+&lt;script&gt;
+update();
+&lt;/script&gt;|||false}}"/>
+            </paths>
+        </localdisk>
+        </settingsfile>
+        <icon value="images/localdisk.png"/>
+    <home value=""/>
+    </service>
+    <service type="file-storage" name="googlecloudstorage">
+        <settingsfile>
+    <googlecloudstorage>
+    </googlecloudstorage>
+        </settingsfile>
+    <icon value="images/googlecloudstorage.png"/>
+    <home value="http://cloud.google.com/products/cloud-storage.html"/>
+    </service>
+    <service type="file-storage" name="dropbox">
+        <settingsfile>
+    <dropbox>
+        <app-key value="{{DROPBOX-CORE-APP-KEY|||Dropbox App Key|||Click &quot;Create app&quot; button on &lt;a href=&quot;https://www.dropbox.com/developers/apps&quot; target=&quot;_new&quot;&gt;this page&lt;/a&gt;, then, follow the red arrows below.||||||||||||true}}"/>
+        <secret-key value="{{DROPBOX-CORE-APP-SECRET|||Dropbox App Secret|||Your Dropbox App Secret. Also found by following red arrows below.||||||images/dropbox_app_settings.png|||&lt;div style=&quot;text-align:center&quot;&gt;&lt;marquee&gt;&lt;h4 style=&quot;color:red&quot;&gt;More settings fields below red picture&lt;/h4&gt;&lt;/marquee&gt;&lt;/div&gt;|||true}}"/>
+        
+        <auth-code value="{{DROPBOX-CORE-AUTH-CODE|||Dropbox App Auth Code|||Click &lt;a onClick=&quot;var dak=document.getElementById(&#39;DROPBOX-CORE-APP-KEY&#39;);var dakv=dak.value;if (dakv.length==0)return false;&quot; href=&quot;https://www.dropbox.com/1/oauth2/authorize?locale=&amp;client_id=abc123&amp;response_type=code&quot; id=&quot;dropbox_app_key_copy&quot; target=&quot;_new&quot;&gt;here&lt;/a&gt; to generate your auth code.|||||||||&lt;script&gt;function updateAppKey(){updateAccessKeyLink();updateAuthCodeLink();}function updateAuthCodeLink(){var dak=document.getElementById(&quot;DROPBOX-CORE-APP-KEY&quot;);var ake=document.getElementById(&quot;dropbox_app_key_copy&quot;);ake.href=&quot;https://www.dropbox.com/1/oauth2/authorize?locale=&amp;client_id=&quot;+dak.value+&quot;&amp;response_type=code&quot;;}var e=document.getElementById(&quot;DROPBOX-CORE-APP-KEY&quot;);e.onchange=updateAppKey;updateAuthCodeLink();&lt;/script&gt;|||true}}"/>        
+        
+        <access-key value="{{DROPBOX-CORE-ACCESS-TOKEN|||Dropbox OAuth 2 Access Token|||Once you fill in your auth code, it&#39;s time to get your permanent access token.Click &lt;a onClick=&quot;updateAccessKeyLink();var dak=document.getElementById(&#39;DROPBOX-CORE-APP-KEY&#39;);var das=document.getElementById(&#39;DROPBOX-CORE-APP-SECRET&#39;);var daas=document.getElementById(&#39;DROPBOX-CORE-AUTH-CODE&#39;);var dakv=dak.value;var dasv=das.value;var daasv=daas.value;if (dakv.length==0||dasv.length==0||daasv.length==0)return false;&quot; href=&quot;api/dropbox-php-sdk-1.1.3/get-access-token.php&quot; id=&quot;dropbox_access_token_link&quot; target=&quot;dropboxauth&quot;&gt;here&lt;/a&gt; to get your access token.|||||||||&lt;script&gt;function updateAccessKeyLink(){var dak=document.getElementById(&#39;DROPBOX-CORE-APP-KEY&#39;);var das=document.getElementById(&#39;DROPBOX-CORE-APP-SECRET&#39;);var daas=document.getElementById(&#39;DROPBOX-CORE-AUTH-CODE&#39;);var dakv=dak.value;var dasv=das.value;var daasv=daas.value;var ake=document.getElementById(&quot;dropbox_access_token_link&quot;);ake.href=&quot;api/dropbox-php-sdk-1.1.3/get-access-token.php?key=&quot;+dakv+&quot;&amp;secret=&quot;+dasv+&quot;&amp;auth=&quot;+daasv+&quot;&quot;;}var e=document.getElementById(&quot;DROPBOX-CORE-APP-KEY&quot;);e.onchange=updateAppKey;var e=document.getElementById(&quot;DROPBOX-CORE-APP-SECRET&quot;);e.onchange=updateAccessKeyLink;var e=document.getElementById(&quot;DROPBOX-CORE-AUTH-CODE&quot;);e.onchange=updateAccessKeyLink;updateAccessKeyLink();&lt;/script&gt;&lt;iframe name=&quot;dropboxauth&quot; src=&quot;api/dropbox-php-sdk-1.1.3/get-access-token.php&quot;&gt;&lt;/iframe&gt;|||true}}"/>
+        <file-expiration value="2029-01-01T00:00:00Z"/>
+        <redirect value="{uri}?q={qid}"/>
+        <folder value="{{DROPBOX-FOLDER-NAME|||Dropbox Folder Name|||Dropbox Folder Name to store files in.|||hisfolder00|||||||||true}}"/>
+        <upload>
+            <default-acl value="public-read"/>
+            <filename value="dynamic"/>
+        </upload>
+        <paths>
+            <job-input value="{{DROPBOX-PATH-UPLOADS-JOBS-INPUTS|||Dropbox Input Path|||This does not have to be changed|||uploads/jobs/inputs|||||||||falsee}}"/>
+            <job-output value="{{DROPBOX-PATH-UPLOADS-JOBS-OUTPUTS|||Dropbox Output Path|||This does not have to be changed|||uploads/jobs/outputs|||||||||false}}"/>
+            <saved-outputs value="{{DROPBOX-PATH-SAVED-OUTPUTS|||Dropbox Saved Outputs Path|||This does not have to be changed|||uploads/saved-outputs|||||||||false}}"/>
+            <strings value="{{DROPBOX-PATH-SAVED-STRINGS|||Dropbox Saved Strings Path|||This does not have to be changed|||uploads/strings|||||||||false}}"/>
+        </paths>
+    </dropbox>
+        </settingsfile>
+    <icon value="images/dropbox.png"/>
+                <dependencies>
+                        <!--
+                        <dependency>
+                                <php-constant-defined>
+                                        <name value="PREG_SET_ORDER"/>
+                                </php-constant-defined>
+                                <error-message value="PHP 5.2+ and PCRE are required."/>
+                        </dependency>
+                        -->
+                        <dependency>
+                                <php-function-exists>
+                                        <name value="curl_init"/>
+                                </php-function-exists>
+                                <error-message value="PHP 5.2+ and cURL (w/HTTPS support) are required."/>
+                        </dependency>
+                        
+                        <!--THE EQUATION BELOW MUST BE TRUE - IF ITS NOT, IT MEANS WE ARE ON A 32 BIT MACHINE - DROPBOX NEEDS 64 BIT-->
+                        <dependency>
+                                <php-equation-true>
+                                        <equation value="strlen((string) PHP_INT_MAX) &gt;= 19"/>
+                                </php-equation-true>
+                                <error-message value="The Dropbox SDK uses 64-bit integers, but it looks like we are running on a version of PHP that does not support 64-bit integers."/>
+                        </dependency>
+                        
+                        <dependency>
+                                <php-function-exists>
+                                        <name value="json_decode"/>
+                                </php-function-exists>
+                                <error-message value="The Dropbox SDK requires the JSON PHP extension, but it looks like you do not have it (couldn't find function json_decode)."/>
+                        </dependency>
+                </dependencies>
+    <home value="https://www.dropbox.com/developers"/>
+    </service>
+    <service type="file-storage" name="googledocs">
+        <icon value="images/googledocs.png"/>
+                <dependencies>
+                        <dependency>
+                                <php-function-exists>
+                                        <name value="Google_Spreadsheet"/>
+                                </php-function-exists>
+                                <error-message value="ZendGdata is required."/>
+                        </dependency>
+                </dependencies>
+        <home value="http://www.farinspace.com/saving-form-data-to-google-spreadsheets/"/>
+    </service>
+    <service type="file-storage" name="ftp">
+    <icon value="images/upload.png"/>
+        <dependencies>
+            <dependency>
+                                <php-constant-defined>
+                                        <name value="FTP_ASCII"/>
+                                </php-constant-defined>
+                                <error-message value="PHP FTP Library is required."/>
+                </dependency>
+        </dependencies>
+    <home value="http://php.net/manual/en/book.ftp.php"/>
+    </service>
+    <service type="file-storage" name="sftp">
+        <icon value="images/upload.png"/>
+                <dependencies>
+                        <dependency>
+                                <php-constant-defined>
+                                        <name value="SSH2_FINGERPRINT_SHA1"/>
+                                </php-constant-defined>
+                                <error-message value="PHP SSH2 Library is required."/>
+                        </dependency>
+                </dependencies>
+    <home value="http://php.net/manual/en/function.ssh2-sftp.php"/>
+    </service>
+    <service type="file-storage" name="box">
+        <settingsfile>
+    <box>
+        <client-id value="{{BOX-OAUTH2-ID|||Box OAuth2 Client Id|||Click &lt;b&gt;&quot;Create an Application&quot;&lt;/b&gt; on &lt;a href=&quot;http://developers.box.com/&quot; target=&quot;_new&quot;&gt;this page&lt;/a&gt;, choose &lt;b&gt;&quot;Box Content&lt;/b&gt;&quot;, then click &lt;b&gt;&quot;Edit Application&quot;&lt;/b&gt;, then click &lt;b&gt;&quot;Configure your application&quot;&lt;/b&gt;.  Your app&#39;s &quot;Client Id&quot; is located on that settings page.||||||||||||true}}"/>
+        
+        <client-secret value="{{BOX-OAUTH2-SECRET|||Box OAuth2 Client Secret|||Your Box app&#39;s secret key. Also found at the above hyperlink.||||||images/box_app_settings.png||||||true}}"/>
+ 
+        <redirect-uri value="{{BOX-REDIRECT-URI|||Box Redirect URI|||Do not change this value.|||$this_server_url|||||||||true}}"/>
+
+        <auth-code value="{{BOX-AUTH-CODE|||Box Auth Code|||Do not change this value.|||{code}||||||&lt;script&gt;function updateSubmit1(){var rdu=&quot;{uri}/install.php?page={page}&quot;;var e=document.getElementById('BOX-OAUTH2-ID');var cid=e.value;var REDIRECTURI=rdu;var inps=document.getElementsByTagName(&quot;input&quot;);for (var i=0;i&lt;inps.length;i++){if (inps[i].name==&quot;BOX-AUTH-CODE&quot; || inps[i].name==&quot;BOX-REDIRECT-URI&quot;)continue;REDIRECTURI=REDIRECTURI+&quot;&amp;&quot;+inps[i].name+&quot;=&quot;+encodeURIComponent(inps[i].value);if (inps[i].name==&quot;BOX-TOKEN&quot;){inps[i].onchange=updateSubmitGood;}else{inps[i].onchange=updateSubmit1;} };var boxauthurl=&quot;https://www.box.com/api/oauth2/authorize?response_type=code&amp;client_id=&quot;+cid+&quot;&amp;redirect_uri=&quot;+encodeURIComponent(REDIRECTURI);e=document.getElementById('BOX-REDIRECT-URI');e.value=(REDIRECTURI);document.forms[0].action=boxauthurl;};setTimeout(function() {updateSubmit1();},250);&lt;/script&gt;|||true}}"/>
+        
+        <token value="{{BOX-TOKEN|||Box Token|||Click &lt;a onClick=&quot;updateAccessKeyLink();var dak=document.getElementById(&#39;BOX-OAUTH2-ID&#39;);var dar=document.getElementById(&#39;BOX-REDIRECT-URI&#39;);var das=document.getElementById(&#39;BOX-OAUTH2-SECRET&#39;);var daas=document.getElementById(&#39;BOX-AUTH-CODE&#39;);var dakv=dak.value;var darv=dar.value;var dasv=das.value;var daasv=daas.value;if (dakv.length==0||dasv.length==0||daasv.length==0||darv.length==0)return false;&quot; href=&quot;api/BoxPHPAPI/get-token.php&quot; id=&quot;box_access_token_link&quot; target=&quot;boxauth&quot;&gt;here&lt;/a&gt; to get your token.|||||||||&lt;script&gt;function updateSubmitGood(){document.forms[0].action='?page='+parseInt({page}+1);};function updateAccessKeyLink(){var dak=document.getElementById(&#39;BOX-OAUTH2-ID&#39;);var dar=document.getElementById(&#39;BOX-REDIRECT-URI&#39;);var das=document.getElementById(&#39;BOX-OAUTH2-SECRET&#39;);var daas=document.getElementById(&#39;BOX-AUTH-CODE&#39;);var dakv=dak.value;var darv=dar.value;var dasv=das.value;var daasv=daas.value;var ake=document.getElementById(&quot;box_access_token_link&quot;);ake.href=&quot;api/BoxPHPAPI/get-token.php?id=&quot;+dakv+&quot;&amp;secret=&quot;+dasv+&quot;&amp;redirect=&quot;+darv+&quot;&amp;code=&quot;+daasv+&quot;&quot;;}var e=document.getElementById(&quot;BOX-OAUTH2-ID&quot;);/*e.onchange=updateAppKey;*/var e=document.getElementById(&quot;BOX-OAUTH2-SECRET&quot;);e.onchange=updateAccessKeyLink;var e=document.getElementById(&quot;BOX-AUTH-CODE&quot;);e.onchange=updateAccessKeyLink;updateAccessKeyLink();&lt;/script&gt;&lt;iframe name=&quot;boxauth&quot; src=&quot;api/BoxPHPAPI/get-token.php&quot;&gt;&lt;/iframe&gt;|||true}}"/>
+
+        <access-token value="{{BOX-ACCESS-TOKEN|||Box Access Token|||Do not change this value.||||||||||||true}}"/>
+        <refresh-token value="{{BOX-REFRESH-TOKEN|||Box Refresh Token|||Do not change this value.||||||||||||true}}"/>
+        
+        <file-expiration value="2029-01-01T00:00:00Z"/>
+        <redirect value="{uri}?q={qid}"/>
+        <folder value="{{BOX-FOLDER-NAME|||Box Folder Name|||Box Folder Name to store files in.|||hisfolder00|||||||||true}}"/>
+        <upload>
+            <default-acl value="public-read"/>
+            <filename value="dynamic"/>
+        </upload>
+        <paths>
+            <job-input value="{{BOX-PATH-UPLOADS-JOBS-INPUTS|||Box Input Path|||This does not have to be changed|||uploads/jobs/inputs|||||||||falsee}}"/>
+            <job-output value="{{BOX-PATH-UPLOADS-JOBS-OUTPUTS|||Box Output Path|||This does not have to be changed|||uploads/jobs/outputs|||||||||false}}"/>
+            <saved-outputs value="{{BOX-PATH-SAVED-OUTPUTS|||Box Saved Outputs Path|||This does not have to be changed|||uploads/saved-outputs|||||||||false}}"/>
+            <strings value="{{BOX-PATH-SAVED-STRINGS|||Box Saved Strings Path|||This does not have to be changed|||uploads/strings|||||||||false}}"/>
+        </paths>
+    </box>
+        </settingsfile>
+    
+        <icon value="images/box.png"/>
+                <dependencies>
+                        <dependency>
+                                <php-function-exists>
+                                        <name value="curl_init"/>
+                                </php-function-exists>
+                                <error-message value="PHP 5.2+ and cURL (w/HTTPS support) are required."/>
+                        </dependency>
+                        <dependency>
+                                <php-equation-true>
+                                        <equation value="strpos(strtolower($this_server_url),'https')!==false || strpos(strtolower($this_server_url),'localhost')!==false || strpos(strtolower($this_server_url),'127.0.0.1')!==false"/>
+                                </php-equation-true>
+                                <error-message value="HTTPS required unless running on localhost"/>
+                        </dependency>
+                </dependencies>
+    <home value="http://developers.box.com/"/>
+    </service>
+    <service type="file-storage" name="filesanywhere">
+        <icon value="images/filesanywhere.png"/>
+                <dependencies>
+                        <dependency>
+                                <php-function-exists>
+                                        <name value="spl_classes"/>
+                                </php-function-exists>
+                                <error-message value="PHP 5.2+ and SPL are required."/>
+                        </dependency>
+                        <dependency>
+                                <php-constant-defined>
+                                        <name value="SOAP_ENCODED"/>
+                                </php-constant-defined>
+                                <error-message value="PHP extension php_soap must be enabled."/>
+                        </dependency>
+                </dependencies>
+    <home value="http://www.filesanywhere.com/API/developer.htm"/>
+    </service>
+    <service type="message-queue" name="no-messaging">
+        <settingsfile>
+    <no-messaging>
+    </no-messaging>
+        </settingsfile>
+        <icon value="images/no-messaging.png"/>
+                <dependencies>
+                </dependencies>
+    <home value=""/>
+    </service>
+    <service type="message-queue" name="sqs">
+        <settingsfile>
+    <sqs>
+        <access-key value="{{SQS-ACCESS-KEY|||AWS Access Key|||Your AWS Access Key. Never share with anyone.|||5F5fDKSLT44G4VM344TG|||||||||true}}"/>
+        <secret-key value="{{SQS-SECRET-KEY|||AWS Secret Key|||Your AWS Secret Key.  Never share with anyone.|||Cr4jZFSDKkea5d8JVSlsaPQf34wa5sdef89wsa4|||images/aws-keys.png||||||true}}"/>
+        <region value="{{SQS-REGION-NAME|||Region|||Choices are REGION_US_E1, REGION_US_W1, REGION_US_W2, REGION_EU_W1, REGION_APAC_SE1, REGION_APAC_SE2, REGION_APAC_NE1, REGION_SA_E1, REGION_US_GOV1|||REGION_US_E1|||||||||true}}"/>
+        <queue-prefix value="{{SQS-QUEUE-PREFIX|||Queue Prefix|||If you want to use your queue for multiple HIS installations, change this.|||his_|||||||||false}}"/>
+    </sqs>
+        </settingsfile>
+        <icon value="images/sqs.png"/>
+                <dependencies>
+                        <dependency>
+                                <php-function-exists>
+                                        <name value="simplexml_load_file"/>
+                                </php-function-exists>
+                                <error-message value="PHP 5.2+ and SimpleXML are required."/>
+                        </dependency>
+                        <dependency>
+                                <php-constant-defined>
+                                        <name value="JSON_ERROR_UTF8"/>
+                                </php-constant-defined>
+                                <error-message value="PHP 5.2+ and JSON are required."/>
+                        </dependency>
+                        <dependency>
+                                <php-constant-defined>
+                                        <name value="PREG_SET_ORDER"/>
+                                </php-constant-defined>
+                                <error-message value="PHP 5.2+ and PCRE are required."/>
+                        </dependency>
+                        <dependency>
+                                <php-function-exists>
+                                        <name value="spl_classes"/>
+                                </php-function-exists>
+                                <error-message value="PHP 5.2+ and SPL are required."/>
+                        </dependency>
+                        <dependency>
+                                <php-constant-defined>
+                                        <name value="CURLOPT_AUTOREFERER"/>
+                                </php-constant-defined>
+                                <error-message value="PHP 5.2+ and cURL (w/HTTPS support) are required."/>
+                        </dependency>
+                </dependencies>
+    <home value="http://aws.amazon.com/sqs/"/>
+    </service>
+    <service type="message-queue" name="rabbitmq">
+        <settingsfile>
+    <rabbitmq>
+        <server value="{{RABBITHOST|||RabbitMQ Server|||You should be able to get this info from your AMQP host, if localhost does not work.|||localhost|||||||||true}}"/>
+        <user value="{{RABBITUSER|||User Name|||Your RabbitMQ username|||username|||||||||true}}"/>
+        <pass value="{{RABBITPASS|||Password|||...and your RabbitMQ password.|||password|||||||||true}}"/>
+        <vhost value="{{RABBITVHOST|||Virtual Host|||The name of the Virtual Host to use.|||abcdefg|||||||||true}}"/>
+        <queue-prefix value="{{RABBITQUEUEPREFIX|||Queue Prefix|||If you want to use your messaging vhost for multiple HIS installations, change this.|||his_|||||||||false}}"/>
+        <port value="{{RABBITPORT|||RabbitMQ Port|||You should be able to get this info from your AMQP host, if localhost does not work.|||5672|||||||||true}}"/>
+    </rabbitmq>
+        </settingsfile>
+        <icon value="images/rabbitmq.png"/>
+                <!--<dependencies>
+                        <dependency>
+                                <php-function-exists>
+                                        <name value="spl_classesABC"/>
+                                </php-function-exists>
+                                <error-message value="PHP 5.2+ and SPL are required."/>
+                        </dependency>
+                        <dependency>
+                                <php-constant-defined>
+                                        <name value="SOAP_ENCODED"/>
+                                </php-constant-defined>
+                                <error-message value="PHP extension php_soap must be enabled."/>
+                        </dependency>
+                </dependencies>-->
+    <home value="http://www.rabbitmq.com/documentation.html"/>
+    </service>
+</services>

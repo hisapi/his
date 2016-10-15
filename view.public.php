@@ -299,7 +299,7 @@ if ($_GET['v']=="download")
 
 	echo "<a style='zIndex:2;color:black;text-decoration:none;font-size:16px;' href='https://humanintelligencesystem.com/version?get=current'>";
 	echo getTranslation("Latest Release",$_GET);
-	echo " Jul 16, 2014</a>";
+	echo " Jul 17, 2014</a>";
 
 	echo "<br/>";
 

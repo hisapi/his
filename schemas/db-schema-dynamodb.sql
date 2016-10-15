@@ -159,6 +159,8 @@ if ( intval($_POST['substep'])==$number_of_steps)
 {
 	create_table("job_flag",false,"id_job","flag"); 
 	echo " ";
+	create_table("job_status",false,"id_user","id_status_job"); 
+	echo " ";
 }
 
 

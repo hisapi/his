@@ -340,69 +340,54 @@ while (true)
 		$OUTPUT_CONTENT = "";
 		$PROCESS_MANAGER = new Processmanager();
 
-		$new_job_status=new job_new();
+		$new_job_news=new job_new();
 		
 		
 		// CHECK FOR JOBS THAT ARE ALREADY "RUNNING" or "PAUSED" (AWAITING MERGING)
-		$running_exists=false;
-		$paused_exists=false;
-		$merging_exists=false;
-		$undefined_exists=false;
-		$check_existing_jobs = new job_id_user();
 		$unfinished_jobs=array();
-		$already_existing_jobs_assigned_to_this_server = $check_existing_jobs->get_from_hashrange($id_user,$INSTANCE_NAME."@","BEGINS_WITH");
-		if ( $already_existing_jobs_assigned_to_this_server && count($already_existing_jobs_assigned_to_this_server) > 0 )
+		
+		$statuses = array("running","paused","merging","undefined");
+		$existent_statuses=array();
+		foreach ($statuses as $a_status)
 		{
-			foreach ($already_existing_jobs_assigned_to_this_server as &$old_existing_job)
+			$check_existing_jobs = new job_status();
+			$already_existing_jobs_assigned_to_this_server = $check_existing_jobs->get_from_hashrange($id_user,$a_status."#".$INSTANCE_NAME."@","BEGINS_WITH");
+			if ( $already_existing_jobs_assigned_to_this_server && count($already_existing_jobs_assigned_to_this_server) > 0 )
 			{
-				$check_is_child = new ph_child();
-				$check_is_child->get_from_hashrange($old_existing_job['id']);
-				if ($check_is_child->id_child_job!="undefined")
+				foreach ($already_existing_jobs_assigned_to_this_server as &$old_existing_job)
 				{
-					$old_existing_job['id_parent_job']=$check_is_child->id_parent_job;
-				}
-				else
-				{
-					$old_existing_job['id_parent_job']=false;
-				}
-				if ($old_existing_job['id_status']=="merging")
-				{
-					$merging_exists=true;
-				}
-				if ($old_existing_job['id_status']=="running")
-				{
-					$running_exists=true;
-				}
-				if ($old_existing_job['id_status']=="paused")
-				{
-					$paused_exists=true;
-				}
-				if ($old_existing_job['id_status']=="undefined")
-				{
-					$undefined_exists=true;
-				}
-				if ($old_existing_job['id_status']!='done')
-				{
+					$check_is_child = new ph_child();
+					$check_is_child->get_from_hashrange(explode("#",$old_existing_job['id_status_job'])[1]);
+					if ($check_is_child->id_child_job!="undefined")
+					{
+						$old_existing_job['id_parent_job']=$check_is_child->id_parent_job;
+					}
+					else
+					{
+						$old_existing_job['id_parent_job']=false;
+					}
+					$existent_statuses[$a_status]=true;
 					$unfinished_jobs[] = $old_existing_job;
 				}
-			}
+			}			
 		}
+		
 		// RESTART PREVIOUSLY INTERRUPTED RUNNING JOBS
-		if ( $unfinished_jobs && count($unfinished_jobs) > 0 && $running_exists )
+		if ( $unfinished_jobs && count($unfinished_jobs) > 0 && isset($existent_statuses["running"]) )
 		{
 			foreach ($unfinished_jobs as $old_existing_job2)
 			{
-				if ($old_existing_job2['id_status']!="running")
+				if (explode("#",$old_existing_job2['id_status_job'])[0]!="running")
 				{
 					continue;
 				}
 				logger("THIS SERVER HAS PRE-EXISTING RUNNING JOBS THAT MAY HAVE\nBEEN INTERRUPTED WHILE RUNNING - RESTARTING THOSE JOBS\n");
 				// ONLY "RUNNING" JOBS WIL GET TO THIS POINT
 				$running_job = new job_id_user();
-				$running_job->set($old_existing_job2);
+				$running_job->get_from_hashrange($old_existing_job2['id_user'],explode("#",$old_existing_job2['id_status_job'])[1]);
 				
 				$running_job->build(array("obj_user","obj_rqdata","obj_response","obj_output","obj_ad","str_rqdata","str_response","str_output","str_ad"));
-				if (intval($old_existing_job2['int_try'])>intval($running_job->obj_hf->int_retry_count))
+				if (intval($running_job->int_try)>intval($running_job->obj_hf->int_retry_count) && intval($running_job->obj_hf->int_retry_count)>0 )
 				{
 					logger("\tOVER MAX RETRY LIMIT, SETTING JOB=FAILED\n");
 					$JOB_FAILED=true;
@@ -413,15 +398,16 @@ while (true)
 					$BOOL_EXECUTE_JOB_OUTPUT_EXPRESSIONS=false;
 					$BOOL_EXECUTE_MERGING=false;
 					$BOOL_FIND_NEW_JOB=false;	
-					$new_job_status=new job_new();
-					$new_job_status->id_user=$running_job->id_user;
-					$new_job_status->id=$running_job->id;
+					$new_job_news=new job_new();
+					$new_job_news->id_user=$running_job->id_user;
+					$new_job_news->id=$running_job->id;
 				}
 				
 				
 				if ($running_job->id!="undefined" && !$JOB_FAILED)
 				{
 					logger("\tPRE-EXISTING JOB BEING RESTARTED:\n\t".$running_job->id."\n");
+					$running_job->update( array("id_status"=>"new","dt_created"=>$this_epoch_time,"dt_modified"=>$this_epoch_time) );
 					// CLEAR JOB FLAGS
 					$running_job->delete_job_flags();
 					
@@ -432,7 +418,6 @@ while (true)
 					
 					$this_epoch_time=get_time();
 					
-					$running_job->update( array("id_status"=>"new","dt_created"=>$this_epoch_time,"dt_modified"=>$this_epoch_time) );
 				} // END IF (VALID JOB)
 			} // END FOREACH (EACH ALREADY RUNNING JOB)
 		} // END IF (COUNT OF ALREADY RUNNING JOBS)
@@ -447,43 +432,45 @@ while (true)
 		}
 
 
-		$do_merge_pauses_occasionally = $server_loop_idx % 2 == 0 && $server_loop_idx>0;
+		$do_merge_pauses_occasionally = true; // $server_loop_idx % 2 == 0 && $server_loop_idx>0;
 
+		$merging_pickup_time = 30 * 2;
 		
 		// CONTINUE MERGING PREVIOUSLY INTERRUPTED 'PAUSED' MERGES
-		if ($BOOL_EXECUTE_MERGING && $merging_exists && $do_merge_pauses_occasionally)
+		if ($BOOL_EXECUTE_MERGING && isset($existent_statuses["merging"]) && $do_merge_pauses_occasionally)
 		{
 			if ( $unfinished_jobs && count($unfinished_jobs) > 0 )
 			{
-				$new = array();
-				foreach ($unfinished_jobs as $a){
-					$new[$a['id_parent_job']][] = $a;
-				}
-				if ($new && count($new)>0)
+
+				foreach ($unfinished_jobs as $unfinished_job)
 				{
-					$akeys=array_keys($new);
-					$tree = createTree($new, $new[$akeys[0]]);
-					$leaves = treeLeaves($tree);
-					foreach ($leaves as $leaf)
+					if (explode("#",$unfinished_job['id_status_job'])[0]=="merging")
 					{
-						if ($leaf['id_status']=='merging')
+						logger("FOUND A 'MERGING' LEAF NODE (INTERRUPTED PARENT JOB OUTPUT MERGE)\nRESUMING MERGE ON JOB:...\n");
+						logger("\t".explode("#",$unfinished_job['id_status_job'])[1]."\n");
+						// START AS CHILD OF THE LAST PAUSED LEAF NODE, IF THAT CHILD IS "DONE"
+						$THIS_PLACEHOLDER = new ph_child();
+						$all_child_jobs_by_parent = $THIS_PLACEHOLDER->get_from_hashrange(explode("#",$unfinished_job['id_status_job'])[1]);
+						//print_r($all_child_jobs_by_parent);
+						/*
+						// WE CAN ALREADY PRESUME ALL SIBLING JOBS ARE DONE
+						$all_are_done_status = true;
+						foreach ($all_child_jobs_by_parent as $the_child_job)
 						{
-							logger("FOUND A 'MERGING' LEAF NODE (INTERRUPTED PARENT JOB OUTPUT MERGE)\nRESUMING MERGE ON JOB:...\n");
-							logger("\t".$leaf['id']."\n");
-							// START AS CHILD OF THE LAST PAUSED LEAF NODE, IF THAT CHILD IS "DONE"
-							$THIS_PLACEHOLDER = new ph_child();
-							$all_child_jobs_by_parent = $THIS_PLACEHOLDER->get_from_hashrange($leaf['id']);
-							/*
-							// WE CAN ALREADY PRESUME ALL SIBLING JOBS ARE DONE
-							$all_are_done_status = true;
-							foreach ($all_child_jobs_by_parent as $the_child_job)
+						}*/
+						//print_r($THIS_PLACEHOLDER);
+						//echo "THIS PLACEHOLDER:\n";
+						//print_r($THIS_PLACEHOLDER);
+						if ($THIS_PLACEHOLDER->id_parent_job!='undefined')
+						{
+							$CHILD_JOB = new job_id_user();
+							$CHILD_JOB->get_from_hashrange($check_user->id_user,$THIS_PLACEHOLDER->id_child_job);
+							
+							$timespan=(intval(get_time())-intval($CHILD_JOB->dt_modified));
+							if ($timespan>$merging_pickup_time)
 							{
-							}*/
-							//print_r($THIS_PLACEHOLDER);
-							if ($THIS_PLACEHOLDER->id_parent_job!='undefined')
-							{
-								$CHILD_JOB = new job_id_user();
-								$CHILD_JOB->get_from_hashrange($check_user->id_user,$THIS_PLACEHOLDER->id_child_job);
+								//echo "CHILD JOB:\n";
+								//print_r($CHILD_JOB);
 								if ($CHILD_JOB->id!="undefined")
 								{
 									if ($CHILD_JOB->id_status=="merging")
@@ -495,20 +482,23 @@ while (true)
 										$BOOL_EXECUTE_JOB_PARENT_MERGING=true;
 										$BOOL_EXECUTE_JOB_OUTPUT_EXPRESSIONS=true;
 										
-										$new_job_status->id_user = $check_user->id_user;
-										$new_job_status->id = $CHILD_JOB->id;
+										$new_job_news->id_user = $check_user->id_user;
+										$new_job_news->id = $CHILD_JOB->id;
 										break;
 									
 									} // END IF (CHILD JOB == DONE)
 								
 								} // END IF (CHILD JOB EXISTS)
-							} // END IF (PH_PARENT LOOKUP IS VALID)
-						} // END IF (LEAF NODE IS PAUSED)
-					} // END FOREACH (LEAF NODE)
-				} // END IF (IS LIST OF "NEW" JOBS HAVE ANYTHING IN IT?)
+								
+							} // MERGING PICKUP TIME (START MERGING OLD JOBS)
+						} // END IF (PH_PARENT LOOKUP IS VALID)
+					} // END FOREACH (EACH UNFINISHED JOB)
+				
+				} // END FOREACH (UNFINISHED JOB)		
+			
 			} // END IF
 		} // END IF
-
+		
 		// SEND SERVER LOG UPDATES
 		if ( $log_updated && isset($user_server) )
 		{
@@ -534,7 +524,7 @@ while (true)
 			if ($APP['ms']->kind!="no-messaging")
 			{
 				//echo "CHECKING MESSAGES on "."sendto_".$INSTANCE_NAME;
-				$message = $new_job_status->receive("sendto_".$INSTANCE_NAME);
+				$message = $new_job_news->receive("sendto_".$INSTANCE_NAME);
 				//echo "MESSAGE:";
 				//echo($message);
 				if ($message)
@@ -547,8 +537,8 @@ while (true)
 						}
 						//echo "READING";
 						$message_xml= xmlToArray( simplexml_load_string($message) );
-						$new_job_status->fromobjectxml($message_xml);
-						//print_r($new_job_status);
+						$new_job_news->fromobjectxml($message_xml);
+						//print_r($new_job_news);
 					}
 					else
 					{
@@ -563,7 +553,7 @@ while (true)
 				
 				while (!$stop_looking_for_new_job)
 				{
-					$all_new_jobs = $new_job_status->get_from_hashrange($id_user,$INSTANCE_NAME."@","BEGINS_WITH",$max_new_jobs_collection);
+					$all_new_jobs = $new_job_news->get_from_hashrange($id_user,$INSTANCE_NAME."@","BEGINS_WITH",$max_new_jobs_collection);
 					
 					if ($all_new_jobs)
 					{
@@ -571,11 +561,11 @@ while (true)
 						foreach ($all_new_jobs as $each_new_job)
 						{
 							$FIND_JOB=new job_id_user();
-							$FIND_JOB->get_from_hashrange($new_job_status->id_user,$each_new_job['id']);
+							$FIND_JOB->get_from_hashrange($new_job_news->id_user,$each_new_job['id']);
 							if ($FIND_JOB->id!="undefined")
 							{
 								$job_count = $job_count + 1;
-								$new_job_status->set($each_new_job);
+								$new_job_news->set($each_new_job);
 								$stop_looking_for_new_job=true;
 								break;
 							}
@@ -586,13 +576,13 @@ while (true)
 						}
 						if ($job_count==0)
 						{
-							$new_job_status=new job_new();
+							$new_job_news=new job_new();
 							$max_new_jobs_collection=0;
 						}
 					} // END IF
 					else
 					{
-						$new_job_status=new job_new();
+						$new_job_news=new job_new();
 						$stop_looking_for_new_job=true;
 						break;
 					}
@@ -654,7 +644,7 @@ while (true)
 			}
 			
 			// RE-ASSIGN WAITING JOBS IF THIS SERVER HAS NO JOBS OF ITS OWN TO PROCESS
-			if ( ($new_job_status->id_user=="undefined"||$new_job_status->id_user=="") && $do_reassign_occasionally && $is_reassign_server)
+			if ( ($new_job_news->id_user=="undefined"||$new_job_news->id_user=="") && $do_reassign_occasionally && $is_reassign_server)
 			{
 				//$JOB->update(array("id_status"=>"failed"));
 
@@ -717,7 +707,7 @@ while (true)
 				{
 					//echo "HOW MANY WAITING JOBS?";
 					// HOW MANY WAITING JOBS
-					$get_jobs = new job_id_user();
+					$get_jobs = new job_new();
 					$all_jobs = $get_jobs->get_from_hashrange($id_user);
 					//echo "THIS IS REASSIGNER NODE";
 
@@ -733,22 +723,18 @@ while (true)
 					{
 						foreach ($all_jobs as $each_job)
 						{
-							if ($each_job['id_status']=="new")
-							{
+							$job_id = $each_job['id'];
 							
-								$job_id = $each_job['id'];
-								
-								$server_name_split = explode("@",$job_id);
-								$server_name=$server_name_split[0];
-								
-								if ( !isset($first_server_jobs[$server_name]) )
-								{
-									$first_server_jobs[$server_name]=array();
-								}
-								if (count($first_server_jobs[$server_name])<$first_list_length)
-								{
-									$first_server_jobs[$server_name][]=$job_id;
-								}
+							$server_name_split = explode("@",$job_id);
+							$server_name=$server_name_split[0];
+							
+							if ( !isset($first_server_jobs[$server_name]) )
+							{
+								$first_server_jobs[$server_name]=array();
+							}
+							if (count($first_server_jobs[$server_name])<$first_list_length)
+							{
+								$first_server_jobs[$server_name][]=$job_id;
 							}
 						}
 					}
@@ -776,16 +762,15 @@ while (true)
 					{
 						foreach ($all_jobs as $each_job)
 						{
-							if ($each_job['id_status']=="new")
+							$each_job_field = job_id_user();
+							$each_job_field->get_from_hashrange($id_user,$each_job['id']);
+							// HOW MANY WAITING JOBS HAVE WERE MODIFIED LONGER THAN 30 SECONDS AGO
+							$timespan=(intval(get_time())-intval($each_job_field->dt_modified));
+							if ($timespan>$reassign_jobs_older_than_seconds)
 							{
-								// HOW MANY WAITING JOBS HAVE WERE MODIFIED LONGER THAN 30 SECONDS AGO
-								$timespan=(intval(get_time())-intval($each_job['dt_modified']));
-								if ($timespan>$reassign_jobs_older_than_seconds)
+								if ( !in_array($each_job['id'],$dont_reassign_these_jobs) )
 								{
-									if ( !in_array($each_job['id'],$dont_reassign_these_jobs) )
-									{
-										$new_jobs[]=$each_job;
-									}
+									$new_jobs[]=$each_job_field;
 								}
 							}
 						}
@@ -801,9 +786,7 @@ while (true)
 					
 					if ( count($new_jobs) > 0 )
 					{
-					
 						$new_job=$new_jobs[rand(0,count($new_jobs)-1)];
-					
 					
 						$job_assign_hf = $new_job['id_hf'];
 						
@@ -843,12 +826,12 @@ while (true)
 			}
 			if ($idx>5)
 			{
-				//logger("RECEIVED NEW JOB SUBMISSION:\n\t".$INSTANCE_NAME."@".$new_job_status->id."\n\t"."BUT THERE IS NO JOB_ID_USER ENTRY FOR THAT JOB ID\n");
+				//logger("RECEIVED NEW JOB SUBMISSION:\n\t".$INSTANCE_NAME."@".$new_job_news->id."\n\t"."BUT THERE IS NO JOB_ID_USER ENTRY FOR THAT JOB ID\n");
 				//print_r($JOB);
 				$failed_to_find_job=true;
 				break;
 			}
-			$JOB->get_from_hashrange($new_job_status->id_user,$new_job_status->id); // change to drive off of ip address
+			$JOB->get_from_hashrange($new_job_news->id_user,$new_job_news->id); // change to drive off of ip address
 			$idx = $idx + 1;
 		} // END WHILE
 		
@@ -904,7 +887,7 @@ while (true)
 				$assigner_setting->update(array("val"=>$current_not_busy_servers[0]['name']));//"jobcluster-".substr($id_user,0,10),"reassigner");			
 			}
 
-		} // CHANGE REASSIGNER
+		} // END SECTION - CHANGE REASSIGNER
 
 
 		// TODO: WHAT IF AN ENTIRE JOB SERVER MACHINE GOES OFFLINE?  NEED TIMEOUT CHANGE ASSIGNER FUNCTIONALITY
@@ -919,7 +902,7 @@ while (true)
 				break;
 			}
 			sleep(2);
-			$JOB->get_from_hashrange($new_job_status->id_user,$INSTANCE_NAME.$new_job_status->id);
+			$JOB->get_from_hashrange($new_job_news->id_user,$INSTANCE_NAME.$new_job_news->id);
 			$idx=$idx+1;
 		}
 		// JOB STATUS IS NOT "NEW" ANYMORE, SO SKIP THE JOB
@@ -1538,7 +1521,6 @@ while (true)
 				$OUTPUT_CONTENT = $FILE_LOCATION;
 			
 			}
-			
 
 			// NO OUTPUT?
 			if ( strlen($OUTPUT_CONTENT) == 0 )
@@ -1546,8 +1528,9 @@ while (true)
 				$OUTPUT_CONTENT = "no output from job";
 			}
 
-
 		} // END IF ($BOOL_EXECUTE_JOB_EXECUTION)
+			
+		//print_r($the_post);
 
 		if ($BOOL_EXECUTE_JOB_POSTPROCESSING)
 		{
@@ -1779,12 +1762,13 @@ while (true)
 			{
 				// UPDATE JOB STATUS TO FAILED
 				$this_time_epoch = get_time();
-				$JOB->update_raw(array("id_status"=>$JOB_FAIL_STATUS,"str_response"=>$NEW_STRING->id,"dt_modified"=>$this_time_epoch,"dt_created"=>$this_time_epoch));
+				$JOB->update(array("id_status"=>$JOB_FAIL_STATUS,"dt_modified"=>$this_time_epoch,"dt_created"=>$this_time_epoch));
+				$JOB->update_raw(array("str_response"=>$NEW_STRING->id));
 			}
 			$BOOL_EXECUTE_JOB_PARENT_MERGING=false;
 			$BOOL_EXECUTE_JOB_OUTPUT_EXPRESSIONS=false;
 			$BOOL_EXECUTE_JOB_EXECUTION=false;
-		}		
+		} // END IF (JOB FAILURE)
 		
 		if ($BOOL_EXECUTE_JOB_PARENT_MERGING)
 		{
@@ -1810,7 +1794,8 @@ while (true)
 						$props['id']=$sha1_string;
 						$props['val']=$OUTPUT_CONTENT;
 						$NEW_STRING->create($props);
-						$JOB->update_raw(array("id_status"=>"paused","str_response"=>$NEW_STRING->id,"dt_modified"=>get_time()));
+						$JOB->update_raw(array("str_response"=>$NEW_STRING->id));
+						$JOB->update(array("id_status"=>"paused","dt_modified"=>get_time()));
 
 						logger( "\t\t" ."SETTING STATUS TO 'PAUSED'". "\n");
 					} // END IF (JOB IS NOT ALREADY PAUSED)
@@ -1829,8 +1814,9 @@ while (true)
 						$NEW_STRING->create($props);
 						
 						$this_time_epoch = get_time();
+						$JOB->update_raw(array("str_response"=>$NEW_STRING->id));
+						$JOB->update(array("id_status"=>"done","dt_modified"=>$this_time_epoch,"dt_done"=>$this_time_epoch));
 						$JOB->delete_ph_decendants();
-						$JOB->update_raw(array("id_status"=>"done","str_response"=>$NEW_STRING->id,"dt_modified"=>$this_time_epoch,"dt_done"=>$this_time_epoch));
 						logger( "\t\t" ."SETTING STATUS TO 'DONE'". "\n");
 					}
 				} // END IF - IS THIS JOB A PARENT JOB?
@@ -2015,6 +2001,7 @@ while (true)
 										$bool_all_jobs_completed=false;
 										break;
 									}
+									//print_r($CHILD_JOB);
 									$CHILD_JOB->build(array("obj_rqdata","obj_response","obj_ad","obj_hf","obj_user"));
 									$EACH_PLACEHOLDER['output']=$CHILD_JOB->obj_output->body;
 									$ALL_PLACEHOLDERS_WITH_JOB_RESPONSE[]=$EACH_PLACEHOLDER;
@@ -2080,9 +2067,10 @@ while (true)
 							// MOVED PARENT JOB = DONE TO BE AFTER PLACEHOLDER REPLACEMENTS
 							$this_time_epoch=get_time();
 							
-							logger( "\t\tDELETING ALL DESCENDANT CHILD JOBS\n" );							
-							$PARENT_JOB->delete_ph_decendants();
+							logger( "\t\tDELETING ALL DESCENDANT CHILD JOBS\n" );
 							$PARENT_JOB->update(array("id_status"=>"done","dt_done"=>$this_time_epoch,"dt_modified"=>$this_time_epoch));
+							$THIS_JOB->update(array("id_status"=>"done"));
+							$PARENT_JOB->delete_ph_decendants();
 							
 							$JID_MERGE_CHECK=$PARENT_JID;
 
@@ -2189,7 +2177,7 @@ while (true)
 					//$JOB=new job_id_user();
 					if ($JOB->id_user=="undefined")
 					{
-						$JOB->get_from_hashrange($new_job_status->id_user,$INSTANCE_NAME."@".$new_job_status->id);
+						$JOB->get_from_hashrange($new_job_news->id_user,$INSTANCE_NAME."@".$new_job_news->id);
 					}
 					
 					//$adjacent_dictionary['test']="hi";
@@ -2343,7 +2331,7 @@ while (true)
 		
 		if ($JOB->obj_hf->int_cleanup=="1" && $BOOL_EXECUTE_JOB_EXECUTION)
 		{
-			logger("\tCLEANING UP JOB...\n");
+			logger("\n\tCLEANING UP JOB...\n");
 			try
 			{
 				@rrmdir($JOB_FOLDER);

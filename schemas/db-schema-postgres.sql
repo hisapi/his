@@ -274,3 +274,11 @@ CREATE TABLE job_flag (
 ALTER TABLE public.job_flag OWNER TO USERNAME;
 ALTER TABLE ONLY job_flag ADD CONSTRAINT job_flag_pkey PRIMARY KEY (id_job, flag);
 
+CREATE TABLE job_status (
+    id_user character varying(50) DEFAULT 'undefined'::character varying NOT NULL,
+    id_status_job character varying(100) DEFAULT 'undefined'::character varying NOT NULL
+);
+ALTER TABLE public.job_status OWNER TO USERNAME;
+ALTER TABLE ONLY job_status ADD CONSTRAINT job_status_pkey PRIMARY KEY (id_user, id_status_job);
+
+

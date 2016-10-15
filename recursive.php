@@ -2108,7 +2108,7 @@ function expression_results_and_interface($OBJ_EXPR,$idx,$entire_match,$idt,$boo
 			} // END IF (ANY MATCH ENTRIES ON THIS MATCH)
 				
 			// NO MATCH PROCESSING FILTERS ON THIS AT ALL; PRINT OUT THE VALUE YOU HAVE
-			if (!$bool_has_filter && (!$bool_has_output || ($bool_has_output && $bool_has_output_type_print)) )
+			if (!$bool_has_filter && !$bool_has_output  )
 			{
 				if ($mode_cxml && !$mode_jidonly)
 				{

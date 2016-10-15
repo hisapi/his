@@ -771,8 +771,6 @@ if ( !$posted_content && ( $ephemeral_remote || $refresh_cache || $mode_xml || $
 				{
 					$new_job->create($prop);
 				}
-
-                
                 
 				if ($mode_jidonly)
 				{

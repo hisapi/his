@@ -1017,8 +1017,8 @@ function createTree(&$list, $parent){
     if ( is_array($parent) && count($parent)>0 )
     {
     foreach ($parent as $k=>$l){
-        if(isset($list[$l['id']])){
-            $l['children'] = createTree($list, $list[$l['id']]);
+        if(isset($list[$l['id_status_job']])){
+            $l['children'] = createTree($list, $list[explode("#",$l['id_status_job'])[1]]);
         }
         $tree[] = $l;
     }

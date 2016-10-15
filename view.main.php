@@ -2777,26 +2777,15 @@ if ( $_GET['v']=="job-servers" )
 		echo "'/></form>";
 	}
 
-	$working_job = new job_id_user();
-	$working_jobs=$working_job->get_from_hashrange($u->id_user);
-	$unfinished_jobs=array();
-	if ( isset($working_jobs) && $working_jobs)
-	{
-		foreach ($working_jobs as $working_job)
-		{
-			if ($working_job['id_status']!='done')
-			{
-				$unfinished_jobs[] = $working_job;
-			}
-		}
-	}
+	$working_job = new job_status();
+	$unfinished_jobs=$working_job->get_from_hashrange($u->id_user);
 
 	$unique_statuses=array();
 	if ( count($unfinished_jobs)>0 )
 	{
 		foreach ($unfinished_jobs as $unfinished_job)
 		{
-			$status = $unfinished_job['id_status'];
+			$status = explode("#",$unfinished_job['id_status_job'])[0];
 			if ( in_array($status,array_keys($unique_statuses)) )
 			{
 				$unique_statuses[$status]=intval($unique_statuses[$status])+1;
@@ -2885,19 +2874,23 @@ if ( $_GET['v']=="job-servers" )
 			echo "</tr>";
 		foreach ($unfinished_jobs as $unfinished_job)
 		{
+			$job_id = explode("#",$unfinished_job['id_status_job'])[1];
+			$job_obj = new job_id_user();
+			$job_obj->get_from_hashrange($u->id_user,$job_id);
+			
 			$hf_obj = new hf_id_user();
-			$hf_obj->get_from_hashrange($u->id_user,$unfinished_job['id_hf']);
+			$hf_obj->get_from_hashrange($u->id_user,$job_obj->id_hf);
 			echo "<tr>";
 	
 			echo "<td colspan='6' nowrap='nowrap' style='padding-right:15px;' valign='top'>";
-			echo "<a target='_new' name='unfinished_".$unfinished_job['id']."' href='$this_server_url/get.php?return=output&job=".$unfinished_job['id']."'>";
-			echo $unfinished_job['id'];
+			echo "<a target='_new' name='unfinished_".$job_obj->id."' href='$this_server_url/get.php?return=output&job=".$job_obj->id."'>";
+			echo $job_obj->id;
 			echo "</a>";
 			echo "</td>";
 			echo "<td rowspan='3'>";
 
 			echo "<form method='post' action='?v=job-servers&action=delete-job'>";
-			echo "<input type='hidden' name='id' value='".htmlspecialchars($unfinished_job['id'],ENT_QUOTES)."'/>";
+			echo "<input type='hidden' name='id' value='".htmlspecialchars($job_obj->id,ENT_QUOTES)."'/>";
 			echo "<input type='submit' value='";
 			echo getTranslation("Delete",$settings);
 			echo "' style='background-color:".rcolor()."'/>";
@@ -2908,7 +2901,7 @@ if ( $_GET['v']=="job-servers" )
 			echo "<td rowspan='3'>";
 
 			echo "<form method='post' action='?v=job-servers&action=reassign-job'>";
-			echo "<input type='hidden' name='id' value='".htmlspecialchars($unfinished_job['id'],ENT_QUOTES)."'/>";
+			echo "<input type='hidden' name='id' value='".htmlspecialchars($job_obj->id,ENT_QUOTES)."'/>";
 			echo "<input type='submit' value='";
 			echo getTranslation("Reassign",$settings);
 			echo "' style='background-color:".rcolor()."'/>";
@@ -2921,7 +2914,7 @@ if ( $_GET['v']=="job-servers" )
 			echo ":";
 
 			echo "<form style='display:inline;' method='post' action='?v=job-servers&action=update-job-status'>";
-			echo "<input type='hidden' name='id' value='".htmlspecialchars($unfinished_job['id'],ENT_QUOTES)."'/>";
+			echo "<input type='hidden' name='id' value='".htmlspecialchars($job_obj->id,ENT_QUOTES)."'/>";
 
 			echo "<select name='id_status' style='background-color:".rcolor().";display:inline;'>";			
 			echo "<option value=''>";
@@ -2952,7 +2945,7 @@ if ( $_GET['v']=="job-servers" )
 			echo "<td>";
 			echo "</td>";
 			echo "<td colspan='5' nowrap='nowrap' style='padding-right:15px;' valign='top'>";
-			echo "<a target='_new' href='$this_server_url/?q=".$unfinished_job['id_hf']."&v=overview'>";
+			echo "<a target='_new' href='$this_server_url/?q=".$job_obj->id_hf."&v=overview'>";
 			echo $hf_obj->name;
 			echo "</a>";
 			echo "</td>";
@@ -2961,28 +2954,28 @@ if ( $_GET['v']=="job-servers" )
 			echo "<td>";
 			echo "</td>";
 			echo "<td align='center'>";
-			echo "<a href='?q=$qn&v=job-servers#unfinished_".$unfinished_job['id']."'><img src='images/refresh.png' width='20' title='".getTranslation("Refresh this job in list",$settings)."' alt='".getTranslation("Refresh this job in list",$settings)."'/>";
+			echo "<a href='?q=$qn&v=job-servers#unfinished_".$job_obj->id."'><img src='images/refresh.png' width='20' title='".getTranslation("Refresh this job in list",$settings)."' alt='".getTranslation("Refresh this job in list",$settings)."'/>";
 			echo "</td>";
 			echo "<td style='padding-right:15px;' valign='top'>";
 
-			echo "<a target='_new' href='$this_server_url/get.php?return=status&job=".$unfinished_job['id']."'>";
-			echo $unfinished_job['id_status'];
+			echo "<a target='_new' href='$this_server_url/get.php?return=status&job=".$job_obj->id."'>";
+			echo $job_obj->id_status;
 			echo "</a>";			
 
 			echo "</td>";
 
 			echo "<td style='padding-right:15px;text-align:center;' valign='top' nowrap='nowrap'>";
-			echo $unfinished_job['int_try'];
+			echo $job_obj->int_try;
 			echo "</td>";
 
 
 			echo "<td style='padding-right:15px;' valign='top' nowrap='nowrap'>";
-			echo time_elapsed(intval(gmdate('U'))-intval($unfinished_job['dt_created']));
+			echo time_elapsed(intval(gmdate('U'))-intval($job_obj->dt_created));
 			echo " ";
 			echo getTranslation("ago",$settings);
 			echo "</td>";
 			echo "<td style='padding-right:15px;' valign='top' nowrap='nowrap'>";
-			echo time_elapsed(intval(gmdate('U'))-intval($unfinished_job['dt_modified']));
+			echo time_elapsed(intval(gmdate('U'))-intval($job_obj->dt_modified));
 			echo " ";
 			echo getTranslation("ago",$settings);
 			//echo $unfinished_job['dt_modified'];
@@ -3013,14 +3006,14 @@ if ( $_GET['v']=="job-servers" )
 
 
 
-
-
-
-
 	foreach ($unfinished_jobs as &$unfinished_job)
 	{
+		$job_id = explode("#",$unfinished_job['id_status_job'])[1];
+		$job_obj = new job_id_user();
+		$job_obj->get_from_hashrange($u->id_user,$job_id);
+			
 		$check_is_child = new ph_child();
-		$check_is_child->get_from_hashrange($unfinished_job['id']);
+		$check_is_child->get_from_hashrange($job_obj->id);
 		if ($check_is_child->id_child_job!="undefined")
 		{
 			$unfinished_job['id_parent_job']=$check_is_child->id_parent_job;

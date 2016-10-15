@@ -785,14 +785,14 @@ class his
 		global $APP;
 		if ($this->obj_debug)
 		{
-			echo "before remove";
-			print_r($props);
+			//echo "before remove";
+			//print_r($props);
 		}
 		$props=$this->remove_non_members($props);
 		if ($this->obj_debug)
 		{
-			echo "after remove";
-			print_r($props);
+			//echo "after remove";
+			//print_r($props);
 		}
 		$props_keys=array_keys($props);
 		for($i=0;$i<count($props_keys);$i++)
@@ -813,8 +813,8 @@ class his
 		{
 			echo "<pre>";
 			echo "CREATE()<br/>";
-			echo "PROPS:<br/>";
-			print_r($props);
+			//echo "PROPS:<br/>";
+			//print_r($props);
 			$APP['db']->debug=true;
 		}
 		$APP['db']->insert(get_class($this),$props);
@@ -2814,6 +2814,21 @@ class job_new extends his
 		}
 	}
 }
+class job_status extends his
+{
+	public $obj_key_type='hashrange';
+	public $id_user='undefined';
+	public $id_status_job='undefined';
+	public function build($obj_build_exclude=array())
+	{
+		parent::build($obj_build_exclude);
+		if ($this->id_user!='undefined')
+		{
+			$this->obj_user=new user_id_user();
+			$this->obj_user->get_from_hashrange($this->id_user);
+		}
+	}
+}
 class job_id_user extends his
 {
 	public $obj_key_type='hashrange';
@@ -2861,14 +2876,32 @@ class job_id_user extends his
             else
             {
                 $create_new_job->create($prop);
+				$this->delete_job_status();
             }
         }
 	}
 	public function update($new_props,$mode_raw=false)
 	{
+		if ($this->obj_debug)
+		{
+			echo "PARENT UPDATE\n";
+			print_r($this);
+		}
 		if ( isset($new_props['id_status']) && $new_props['id_status']=="new")
 		{
 			$this->status_new();
+		}
+		else if ( isset($new_props['id_status']) && ($new_props['id_status']=="done") )
+		{
+			$this->delete_job_status();
+		}
+		else if ( isset($new_props['id_status']) )
+		{
+			$this->delete_job_new();
+			$this->delete_job_status();
+			$check_job_status = new job_status();
+			$props=array("id_user"=>$this->id_user,"id_status_job"=>$new_props['id_status']."#".$this->id);
+			$check_job_status->create($props);
 		}
 		parent::update($new_props,$mode_raw);
 	}
@@ -2892,6 +2925,7 @@ class job_id_user extends his
 	}
 	public function delete_ph_decendants()
 	{
+		return;
 		if ($this->id!="undefined")
 		{
 			$old_ph_parent = new ph_parent();
@@ -2932,6 +2966,30 @@ class job_id_user extends his
 			}
 		} // END IF
 	} // END FUNCTION 
+	
+	public function delete_job_status()
+	{
+		global $APP;
+		if ($APP['ms']->kind!="no-messaging")
+		{
+			// SOME TYPE OF MESSAGING IS BEING USED
+		}
+		else
+		{
+			$check_job_status = new job_status();
+			$check_job_status->get_from_hashrange($this->id_user,$this->id_status."#".$this->id);
+			if ($check_job_status->id_user!="undefined")
+			{
+				$check_job_status->delete();
+			}
+		} // END IF
+	} // END FUNCTION 
+	
+	
+	
+	
+	
+	
 	public function delete()
 	{
 		// CLEAR JOB FLAGS

@@ -27,7 +27,8 @@ $versions[]="2014-04-18";
 $versions[]="2014-04-19";
 $versions[]="2014-04-24";
 $versions[]="2014-07-13";
-$versions[]=$software_version; // CURRENT VERSION: "2014-07-16";
+$versions[]="2014-07-16";
+$versions[]=$software_version; // CURRENT VERSION: "2014-07-17";
 //$versions[]=$software_version; // "2024-08-26";  // FUTURE SOFTWARE VERSION APPEAR BELOW
 $error_database_from_future_version = false;
 

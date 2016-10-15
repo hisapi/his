@@ -1403,6 +1403,7 @@ if ($_GET['page']==13 && $DB_CONNECT && $FS_CONNECT && file_exists($BIN_DIR.$PAT
 					{
 						$table_exist=array();
 						$table_exist[]="job_new";
+						$table_exist[]="job_status";
 						$table_exist[]="job_id_user";
 						$table_exist[]="match_custom";
 						$table_exist[]="match_entry";

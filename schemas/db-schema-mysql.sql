@@ -266,3 +266,10 @@ CREATE TABLE IF NOT EXISTS job_flag (
   status varchar(100) NOT NULL DEFAULT 'undefined',
   PRIMARY KEY (id_job,flag)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS job_status;
+CREATE TABLE IF NOT EXISTS job_status (
+  id_user varchar(50) NOT NULL DEFAULT 'undefined',
+  id_status_job varchar(100) NOT NULL DEFAULT 'undefined',
+  PRIMARY KEY (id_user,id_status_job)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

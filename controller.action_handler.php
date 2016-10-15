@@ -30,6 +30,7 @@ if ( isset($_GET['action']) )
 					// CLEAR PH_* ENTRIES
 					$check_job->delete_ph_decendants();
 					$check_job->delete_job_new();
+					$check_job->delete_job_status();
 				}
 				if ($new_status=="new")
 				{
@@ -79,26 +80,13 @@ if ( isset($_GET['action']) )
 			$DELETE_JOB->get_from_hashrange($u->id_user,$_POST['id']);
 			if ($DELETE_JOB->id!="undefined")
 			{
+				// CLEAR JOB FLAGS
+				$DELETE_JOB->delete_job_flags();
+				// CLEAR PH_* ENTRIES
+				$DELETE_JOB->delete_ph_decendants();
+				$DELETE_JOB->delete_job_new();
+				$DELETE_JOB->delete_job_status();
 				$DELETE_JOB->delete();
-
-				$old_job_flags = new job_flag();
-				$all_old_flags = $old_job_flags->get_from_hashrange($_POST['id']);
-				foreach ($all_old_flags as $an_old_flag)
-				{
-					$delete_job_flag = new job_flag();
-					$delete_job_flag->set($an_old_flag);
-					if ($delete_job_flag->id_job!="undefined")
-					{
-						$delete_job_flag->delete();
-					}
-				}
-
-			}
-			$DELETE_JOB_NEW = new job_id_user();
-			$DELETE_JOB_NEW->get_from_hashrange($u->id_user,$_POST['id']);
-			if ($DELETE_JOB_NEW->id!="undefined")
-			{
-				$DELETE_JOB_NEW->delete();
 			}
 		} // END IF (ID SET)
 	} // END IF (ACTION IS DELETE-JOB)

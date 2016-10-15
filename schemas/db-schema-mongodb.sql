@@ -179,6 +179,12 @@ try{
 } catch (Exception $e) {
         print_r($e);
 }
+try{
+	$c=$APP['db']->db->selectDB($APP['db']->dbname)->createCollection("job_status");
+	$c->ensureIndex(array("id_user" => 1,"id_status_job"=>1), array("unique" => 1, "dropDups" => 1));
+} catch (Exception $e) {
+        print_r($e);
+}
 
 sleep(6);
 

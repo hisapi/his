@@ -1,6 +1,6 @@
 <?php
 include("version.php");
-include("demos.php");
+if ( file_exists("demos.php") ) { include("demos.php"); }
 include("extensions.php");
 global $demo_domain;
 

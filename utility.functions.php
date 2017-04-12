@@ -436,7 +436,10 @@ function is_secret($str)
 	} // end for
 	return false;
 } // end function
-
+function outerxml($node)
+{
+	return $node->asXML();
+}
 function innerxml($node)
 {
 	$content="";
@@ -463,7 +466,13 @@ function if_attribute_xpath_parse($val,$xpath)
 	{
 		$rest_xpath = substr($last_xpath_part,1);
 	}
+	$val_simplified = "";
+	try
+	{
 	$val_simplified = preg_replace("# ".$rest_xpath."=\"(.*?)\"#i","$1",$val);
+	} catch (Exception $e)
+	{
+	}
 	if ($is_attribute_xpath)
 	{
 		$val=$val_simplified;

@@ -640,7 +640,7 @@ function expression_results_and_interface($OBJ_EXPR,$idx,$entire_match,$idt,$boo
 	
 									for ($iii=0;$iii<count($submatches);$iii++)
 									{
-										$submatches[$iii]=array(if_attribute_xpath_parse(innerxml($submatches[$iii]),$filtering_expression));
+										$submatches[$iii]=array(if_attribute_xpath_parse(outerxml($submatches[$iii]),$filtering_expression));
 									}
 								}
 							}

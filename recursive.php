@@ -632,9 +632,11 @@ function expression_results_and_interface($OBJ_EXPR,$idx,$entire_match,$idt,$boo
 						{
 							try
 							{
+								error_reporting(0);
 								// if xpath
-								if ( strlen($filtering_expression)>0 )
+									if ( strlen($filtering_expression)>0 )
 								{
+			
 									$xp_xml = new SimpleXMLElement($this_value);
 									$submatches = $xp_xml->xpath( $filtering_expression ) ;
 	
@@ -643,10 +645,13 @@ function expression_results_and_interface($OBJ_EXPR,$idx,$entire_match,$idt,$boo
 										$submatches[$iii]=array(if_attribute_xpath_parse(outerxml($submatches[$iii]),$filtering_expression));
 									}
 								}
+								error_reporting(-1);
 							}
 							catch (Exception $e)
 							{
+								error_reporting(-1);
 							}
+
 						}
 
 						// XML MODE OUTPUT

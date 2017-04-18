@@ -126,12 +126,14 @@ function expression_results_and_interface($OBJ_EXPR,$idx,$entire_match,$idt,$boo
 
 				echo "<ul style='margin-left:15px;'>";
 				$rows_textarea=1;
-				if ( strlen($this_value)>30 )
+				$this_value_print=$this_value;
+				if ( strlen($this_value)>5000 )
 				{
+					$this_value_print=substr($this_value,0,2500).substr($this_value,2500,2500);
 					//$rows_textarea=2;
 				}
 				echo "<textarea style=\"margin-left:0px;font-family:'Courier New';\" rows='$rows_textarea' cols='60'>";
-				echo str_replace("<","&lt;",$this_value);
+				echo str_replace("<","&lt;",$this_value_print);
 				//echo print_r($this_value);
 				//echo trim(htmlspecialchars($this_value));
 				echo "</textarea>";

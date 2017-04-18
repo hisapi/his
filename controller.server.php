@@ -990,6 +990,7 @@ while (true)
 			}
 			// IF JOB_FOLDER ALREADY EXISTS, CLEAN IT UP
 			$JOB_FOLDER = ($JOBS_FOLDER.$PATH_SEPERATOR.$JID);
+			$adjacent_dictionary["[JOB_FOLDER]"]=$JOB_FOLDER;
 			if ( file_exists($JOB_FOLDER) )
 			{
 				$LIST_OF_FILES=array();
